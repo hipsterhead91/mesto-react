@@ -1,0 +1,6 @@
+.profile__horizontal-alignment {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: baseline;
+}

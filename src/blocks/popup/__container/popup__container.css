@@ -1,0 +1,38 @@
+.popup__container {
+  position: relative;
+  width: 430px;
+  height: 330px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+}
+
+.popup__container_medium {
+  height: 272px;
+}
+
+.popup__container_small {
+  height: 181px;
+}
+
+@media screen and (max-width: 620px) {
+  .popup__container {
+    width: 240px;
+    height: 258px;
+  }
+}
+
+@media screen and (max-width: 620px) {
+  .popup__container_medium {
+    height: 220px;
+  }
+}
+
+@media screen and (max-width: 620px) {
+  .popup__container_small {
+    height: 140px;
+  }
+}

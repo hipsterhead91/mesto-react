@@ -1,0 +1,10 @@
+.profile__vertical-alignment {
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 320px) {
+  .profile__vertical-alignment {
+    align-items: center;
+  }
+}

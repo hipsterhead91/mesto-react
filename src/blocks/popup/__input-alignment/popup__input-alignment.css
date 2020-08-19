@@ -1,0 +1,10 @@
+.popup__input-alignment {
+  width: 358px;
+  position: relative;
+}
+
+@media screen and (max-width: 620px) {
+  .popup__input-alignment {
+    width: 200px;
+  }
+}
