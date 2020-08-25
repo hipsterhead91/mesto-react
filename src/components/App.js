@@ -12,10 +12,10 @@ function App() {
   const [isImagePopupOpen, setIsImagePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({});
 
-  const handleEditAvatarClick = () => { setIsEditAvatarPopupOpen(!isEditAvatarPopupOpen) };
-  const handleEditProfileClick = () => { setIsEditProfilePopupOpen(!isEditProfilePopupOpen) };
-  const handleAddPlaceClick = () => { setIsAddPlacePopupOpen(!isAddPlacePopupOpen) };
-  const handleImagePopupClick = () => { setIsImagePopupOpen(!isImagePopupOpen) };
+  const handleEditAvatarClick = () => { setIsEditAvatarPopupOpen(true) };
+  const handleEditProfileClick = () => { setIsEditProfilePopupOpen(true) };
+  const handleAddPlaceClick = () => { setIsAddPlacePopupOpen(true) };
+  const handleImagePopupClick = () => { setIsImagePopupOpen(true) };
 
   const closeAllPopups = () => {
     setIsEditAvatarPopupOpen(false);
@@ -33,7 +33,7 @@ function App() {
   return (
     <div className="page">
       <Header />
-      <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} getCard={(item) => openImage(item)} />
+      <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} getCard={openImage} />
       <Footer />
 
       {/* ПОПАП ОБНОВЛЕНИЯ АВАТАРА */}

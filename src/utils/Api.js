@@ -73,21 +73,32 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
-  putLike(cardId) {
+  // по рекоммендации ревьюера объединил методы putLike и deleteLike в один, но работоспособность пока не проверял
+  // если всё правильно понял, вторым параметром (isTrue) надо передавать булевое значение, 
+  // и если будет true, то лайк ставится, если false - убирается
+  putLike(cardId, isTrue) {
     return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-      method: 'PUT',
+      method: isTrue ? 'PUT' : 'DELETE',
       headers: this._headers
     })
       .then(result => { return this._checkResponse(result); })
   }
 
-  deleteLike(cardId) {
-    return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-      method: 'DELETE',
-      headers: this._headers
-    })
-      .then(result => { return this._checkResponse(result); })
-  }
+  // putLike(cardId) {
+  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+  //     method: 'PUT',
+  //     headers: this._headers
+  //   })
+  //     .then(result => { return this._checkResponse(result); })
+  // }
+
+  // deleteLike(cardId) {
+  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+  //     method: 'DELETE',
+  //     headers: this._headers
+  //   })
+  //     .then(result => { return this._checkResponse(result); })
+  // }
 
 }
 

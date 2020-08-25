@@ -1,6 +1,6 @@
 import React from 'react';
 import avatarPath from '../../images/avatar.jpg';
-import api from '../../utils/Api.js';
+import api from '../../utils/api.js';
 import Card from '../Card/Card.js';
 
 function Main(props) {
@@ -10,18 +10,11 @@ function Main(props) {
   const [cards, setCards] = React.useState([]);
 
   React.useEffect(() => {
-    api.getUserData()
-      .then(user => {
+    Promise.all([api.getUserData(), api.getInitialCards()])
+      .then(([user, initialCards]) => {
         setUserName(user.name);
         setUserInfo(user.about);
         setUserAvatar(user.avatar);
-      })
-      .catch(error => console.error(error))
-  }, [userName, userInfo, userAvatar]);
-
-  React.useEffect(() => {
-    api.getInitialCards()
-      .then(initialCards => {
         setCards(initialCards);
       })
       .catch(error => console.error(error))
@@ -46,7 +39,7 @@ function Main(props) {
         <button className="profile__add-button" type="button" onClick={props.onAddPlace}></button>
       </section>
       <section className="elements">
-        {cards.map(card => <Card key={card._id} card={card} link={card.link} name={card.name} likes={card.likes} onCardClick={(item) => props.getCard(item)} />)}
+        {cards.map(card => <Card key={card._id} card={card} link={card.link} name={card.name} likes={card.likes} onCardClick={props.getCard} />)}
       </section>
     </main>
   );
