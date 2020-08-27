@@ -5,15 +5,13 @@ class Api {
     this._headers = options.headers;
   }
 
-  // ПРОВЕРКА ОТВЕТА ОТ СЕРВЕРА
-
+  // проверка ответа от сервера
   _checkResponse(result) {
     if (result.ok) { return result.json() }
     else { return Promise.reject(`Ошибка: ${result.status}`) }
   }
 
-  // РАБОТА С ИНФОРМАЦИЕЙ О ПОЛЬЗОВАТЕЛЕ
-
+  // получение информации о пользователе (имя, профессия, аватар)
   getUserData() {
     return fetch(`${this._baseUrl}/users/me`, {
       headers: this._headers
@@ -21,6 +19,7 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
+  // обновление информации о пользователе (имя, профессия)
   patchUserInfo(newName, newJob) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
@@ -33,6 +32,7 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
+  // обновление аватара
   patchUserAvatar(newAvatar) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: 'PATCH',
@@ -44,8 +44,7 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
-  // РАБОТА С КАРТОЧКАМИ
-
+  // запрос карточек с сервера
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
       headers: this._headers
@@ -53,6 +52,7 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
+  // добавление новой карточки
   postNewCard(cardTitle, cardImage) {
     return fetch(`${this._baseUrl}/cards`, {
       method: 'POST',
@@ -65,6 +65,7 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
+  // удаление карточки
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: 'DELETE',
@@ -73,32 +74,14 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
-  // по рекоммендации ревьюера объединил методы putLike и deleteLike в один, но работоспособность пока не проверял
-  // если всё правильно понял, вторым параметром (isTrue) надо передавать булевое значение, 
-  // и если будет true, то лайк ставится, если false - убирается
-  putLike(cardId, isTrue) {
+  // постановка/снятие лайка
+  changeLike(cardId, isNotLiked) {
     return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-      method: isTrue ? 'PUT' : 'DELETE',
+      method: isNotLiked ? 'PUT' : 'DELETE',
       headers: this._headers
     })
       .then(result => { return this._checkResponse(result); })
   }
-
-  // putLike(cardId) {
-  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-  //     method: 'PUT',
-  //     headers: this._headers
-  //   })
-  //     .then(result => { return this._checkResponse(result); })
-  // }
-
-  // deleteLike(cardId) {
-  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-  //     method: 'DELETE',
-  //     headers: this._headers
-  //   })
-  //     .then(result => { return this._checkResponse(result); })
-  // }
 
 }
 
