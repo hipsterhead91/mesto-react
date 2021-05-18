@@ -17,10 +17,10 @@ function EditAvatarPopup(props) {
 
   return (
     <PopupWithForm
-      name='avatar'
-      title='Обновить аватар'
-      button='Сохранить'
-      sizeModifier='popup__container_medium'
+      name={props.name}
+      title={props.title}
+      button={props.button}
+      sizeModifier={props.sizeModifier}
       isOpen={props.isOpen}
       onClose={props.onClose}
       onSubmit={handleSubmit} >

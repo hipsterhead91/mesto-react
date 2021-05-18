@@ -7,6 +7,7 @@ import EditAvatarPopup from './EditAvatarPopup.js';
 import EditProfilePopup from './EditProfilePopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import ImagePopup from './ImagePopup.js';
+import ConfirmationPopup from './ConfirmationPopup.js';
 import api from '../utils/Api.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
 
@@ -14,34 +15,32 @@ import CurrentUserContext from '../contexts/CurrentUserContext.js';
 
 function App() {
 
-  // текущий пользователь, список карточек
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
 
+  // получаем данные пользователя при запуске приложения
   React.useEffect(() => {
     api.getUserData()
       .then(user => setCurrentUser(user))
       .catch(error => console.error(error))
   }, []);
 
+  // получаем карточки с сервера при запуске приложения
   React.useEffect(() => {
     api.getInitialCards()
       .then(initialCards => setCards(initialCards))
       .catch(error => console.error(error))
   });
 
-  // статусы попапов (открыт/закрыт) + текущая карточка в попапе с полноразмерной картинкой
+  // статусы попапов (открыт/закрыт)
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState({});
+  const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = React.useState(false);
 
-  // клики по кнопкам и картинкам
-  const handleEditAvatarClick = () => { setIsEditAvatarPopupOpen(true) };
-  const handleEditProfileClick = () => { setIsEditProfilePopupOpen(true) };
-  const handleAddPlaceClick = () => { setIsAddPlacePopupOpen(true) };
-  const handleImagePopupClick = () => { setIsImagePopupOpen(true) };
+  // определяем текущую карточку (например для трансляции в попап с полноразмерной картинкой)
+  const [selectedCard, setSelectedCard] = React.useState({});
 
   // закрытие попапов
   const closeAllPopups = () => {
@@ -49,13 +48,14 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsImagePopupOpen(false);
+    setIsConfirmationPopupOpen(false);
     setSelectedCard({});
   };
 
   // открытие попапа с полноразмерной картинкой
   function openImage(card) {
     setSelectedCard(card);
-    handleImagePopupClick();
+    setIsImagePopupOpen(true);
   }
 
   // обновление аватара
@@ -99,14 +99,21 @@ function App() {
       .catch(error => console.error(error))
   }
 
-  // удаление карточки
+  // клик по корзине
   function handleCardDelete(card) {
-    api.deleteCard(card._id)
-      .then(() => {
-        const newCards = cards.filter(c => c._id !== card._id);
-        setCards(newCards);
-      })
-      .catch(error => console.error(error))
+    setSelectedCard(card);
+    setIsConfirmationPopupOpen(true);
+  }
+
+  // удаление карточки
+  function removeCard() {
+    api.deleteCard(selectedCard._id)
+    .then(() => {
+      const newCards = cards.filter(c => c._id !== selectedCard._id);
+      setCards(newCards);
+      setIsConfirmationPopupOpen(false);
+    })
+    .catch(error => console.error(error))
   }
 
   return (
@@ -116,9 +123,9 @@ function App() {
 
         <Main
           cards={cards}
-          onEditAvatar={handleEditAvatarClick}
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
+          onEditAvatar={() => setIsEditAvatarPopupOpen(true)}
+          onEditProfile={() => setIsEditProfilePopupOpen(true)}
+          onAddPlace={() => setIsAddPlacePopupOpen(true)}
           onGetCard={openImage}
           onCardDelete={handleCardDelete}
           onCardLike={handleCardLike}
@@ -154,12 +161,14 @@ function App() {
           onAddPlace={handleAddPlaceSubmit}
         />
 
-        <PopupWithForm // попап подтверждения удаления карточки (можно вынести в отдельный компонент)
+        <ConfirmationPopup // попап подтверждения удаления карточки (сейчас вообще не работает)
           name='confirmation'
           title='Вы уверены?'
           button='Да'
           sizeModifier='popup__container_small'
-          isOpen={false}
+          isOpen={isConfirmationPopupOpen}
+          onClose={closeAllPopups}
+          onRemoveCard={removeCard}
         />
 
         <ImagePopup // попап полноразмерной картинки
