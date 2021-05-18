@@ -111,8 +111,7 @@ function App() {
       .then(() => {
         const newCards = cards.filter(c => c._id !== selectedCard._id);
         setCards(newCards);
-        setIsConfirmationPopupOpen(false);
-        setSelectedCard({});
+        closeAllPopups();
       })
       .catch(error => console.error(error))
   }
@@ -153,7 +152,7 @@ function App() {
           onCardDelete={handleDeleteClick}
           onCardLike={handleCardLike}
         />
-gi
+
         <Footer />
 
         <EditAvatarPopup // попап обновления аватара
