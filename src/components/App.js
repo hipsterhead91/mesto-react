@@ -130,7 +130,7 @@ function App() {
           onCardDelete={handleCardDelete}
           onCardLike={handleCardLike}
         />
-
+gi
         <Footer />
 
         <EditAvatarPopup // попап обновления аватара
