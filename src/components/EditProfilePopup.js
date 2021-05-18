@@ -46,7 +46,7 @@ function EditProfilePopup(props) {
       <label className="popup__input-alignment">
         <input
           required defaultValue={name} onChange={handleChangeName}
-          id="name" name="name" className="popup__input"
+          id="name" name="name" className="popup__input" autoComplete="off"
           type="text" placeholder="Имя" minLength="2" maxLength="40" />
         <span id="name-error" className="popup__error"></span>
       </label>
@@ -54,7 +54,7 @@ function EditProfilePopup(props) {
       <label className="popup__input-alignment">
         <input
           required defaultValue={description} onChange={handleChangeDescription}
-          id="job" name="job" className="popup__input"
+          id="job" name="job" className="popup__input" autoComplete="off"
           type="text" placeholder="О себе" minLength="2" maxLength="200" />
         <span id="job-error" className="popup__error"></span>
       </label>

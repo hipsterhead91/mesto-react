@@ -27,7 +27,7 @@ function EditAvatarPopup(props) {
 
       <label className="popup__input-alignment">
         <input
-          required ref={avatarRef}
+          required ref={avatarRef} autoComplete="off"
           id="avatar" name="avatar" className="popup__input"
           type="url" placeholder="Ссылка на аватар" />
         <span id="avatar-error" className="popup__error"></span>

@@ -2,13 +2,13 @@ import React from 'react';
 import Header from './Header.js';
 import Main from './Main.js';
 import Footer from './Footer.js';
-import PopupWithForm from './PopupWithForm.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
 import EditProfilePopup from './EditProfilePopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import ImagePopup from './ImagePopup.js';
 import ConfirmationPopup from './ConfirmationPopup.js';
 import api from '../utils/Api.js';
+import { FormValidator, validationOptions } from '../utils/FormValidator.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
 
 // КОРНЕВОЙ КОМПОНЕНТ
@@ -39,7 +39,7 @@ function App() {
   const [isImagePopupOpen, setIsImagePopupOpen] = React.useState(false);
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = React.useState(false);
 
-  // определяем текущую карточку (например для трансляции в попап с полноразмерной картинкой)
+  // определяем текущую карточку (используется для её удаления или для открытия в полном размере)
   const [selectedCard, setSelectedCard] = React.useState({});
 
   // закрытие попапов
@@ -53,7 +53,7 @@ function App() {
   };
 
   // открытие попапа с полноразмерной картинкой
-  function openImage(card) {
+  function handleOpenImage(card) {
     setSelectedCard(card);
     setIsImagePopupOpen(true);
   }
@@ -100,21 +100,44 @@ function App() {
   }
 
   // клик по корзине
-  function handleCardDelete(card) {
+  function handleDeleteClick(card) {
     setSelectedCard(card);
     setIsConfirmationPopupOpen(true);
   }
 
   // удаление карточки
-  function removeCard() {
+  function handleRemoveCard() {
     api.deleteCard(selectedCard._id)
-    .then(() => {
-      const newCards = cards.filter(c => c._id !== selectedCard._id);
-      setCards(newCards);
-      setIsConfirmationPopupOpen(false);
-    })
-    .catch(error => console.error(error))
+      .then(() => {
+        const newCards = cards.filter(c => c._id !== selectedCard._id);
+        setCards(newCards);
+        setIsConfirmationPopupOpen(false);
+        setSelectedCard({});
+      })
+      .catch(error => console.error(error))
   }
+
+  // включаем валидацию форм
+  React.useEffect(() => {
+    const avatarFormValidator = new FormValidator({
+      validationOptions: validationOptions,
+      formSelector: '#avatar-form'
+    });
+    
+    const profileFormValidator = new FormValidator({
+      validationOptions: validationOptions,
+      formSelector: '#profile-form'
+    });
+
+    const newCardFormValidator = new FormValidator({
+      validationOptions: validationOptions,
+      formSelector: '#new-card-form'
+    });
+
+    avatarFormValidator.enableValidation();
+    profileFormValidator.enableValidation();
+    newCardFormValidator.enableValidation();
+  });
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -126,8 +149,8 @@ function App() {
           onEditAvatar={() => setIsEditAvatarPopupOpen(true)}
           onEditProfile={() => setIsEditProfilePopupOpen(true)}
           onAddPlace={() => setIsAddPlacePopupOpen(true)}
-          onGetCard={openImage}
-          onCardDelete={handleCardDelete}
+          onGetCard={handleOpenImage}
+          onCardDelete={handleDeleteClick}
           onCardLike={handleCardLike}
         />
 
@@ -168,7 +191,7 @@ function App() {
           sizeModifier='popup__container_small'
           isOpen={isConfirmationPopupOpen}
           onClose={closeAllPopups}
-          onRemoveCard={removeCard}
+          onRemoveCard={handleRemoveCard}
         />
 
         <ImagePopup // попап полноразмерной картинки
