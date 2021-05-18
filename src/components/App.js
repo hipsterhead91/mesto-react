@@ -60,10 +60,12 @@ function App() {
 
   // обновление аватара
   function handleUpdateAvatar({ avatar }) {
+    const avatarInput = document.querySelector('#avatar');
     api.patchUserAvatar(avatar)
       .then((user) => {
         document.querySelector('.profile__avatar').src = user.avatar;
         closeAllPopups();
+        avatarInput.value = '';
       })
       .catch(error => console.error(error))
   }
@@ -80,10 +82,14 @@ function App() {
 
   // добавление новой карточки
   function handleAddPlaceSubmit({ title, link }) {
+    const titleInput = document.querySelector('#title');
+    const linkInput = document.querySelector('#link');
     api.postNewCard(title, link)
       .then((newCard) => {
         setCards([...cards, newCard]);
         closeAllPopups();
+        titleInput.value = '';
+        linkInput.value = '';
       })
       .catch(error => console.error(error))
   }
