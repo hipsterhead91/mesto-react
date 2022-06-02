@@ -2,8 +2,6 @@ import React from 'react';
 import Card from './Card.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
 
-// ОСНОВНОЙ РАБОЧИЙ БЛОК
-
 function Main(props) {
 
   const currentUser = React.useContext(CurrentUserContext);
@@ -12,19 +10,19 @@ function Main(props) {
     <main>
       <section className="profile">
         <div className="profile__info">
-          <img className="profile__avatar" src={currentUser.avatar} alt="Пользовательский аватар." />
+          <img className="profile__avatar" src={currentUser.avatar} alt="Аватар пользователя" />
           <div className="profile__avatar-overlay">
-            <button onClick={props.onEditAvatar} type="button" className="profile__edit-avatar"></button>
+            <button className="profile__edit-avatar" type="button" onClick={props.onEditAvatar}></button>
           </div>
           <div className="profile__vertical-alignment">
             <div className="profile__horizontal-alignment">
               <h1 className="profile__name">{currentUser.name}</h1>
-              <button onClick={props.onEditProfile} type="button" className="profile__edit-button"></button>
+              <button className="profile__edit-button" type="button" onClick={props.onEditProfile}></button>
             </div>
-            <p className="profile__job">{currentUser.about}</p>
+            <p className="profile__about">{currentUser.about}</p>
           </div>
         </div>
-        <button onClick={props.onAddPlace} type="button" className="profile__add-button"></button>
+        <button className="profile__add-button" type="button" onClick={props.onAddCard}></button>
       </section>
 
       <section className="elements">
@@ -32,9 +30,6 @@ function Main(props) {
           <Card
             key={card._id}
             card={card}
-            name={card.name}
-            link={card.link}
-            likes={card.likes}
             onCardClick={props.onGetCard}
             onCardLike={props.onCardLike}
             onCardDelete={props.onCardDelete}

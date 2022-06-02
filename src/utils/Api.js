@@ -5,13 +5,16 @@ class Api {
     this._headers = options.headers;
   }
 
-  // проверка ответа от сервера
+  // ПРОВЕРКА ОТВЕТА ОТ СЕРВЕРА
+  // Примечание: здесь мы проверяем ответ от сервера и в зависимости от него возвращаем либо нужный 
+  // нам результат, либо ошибку. Этот код вынесен в отдельный приватный метод, поскольку иначе он бы
+  // повторялся во всех остальных методах. DRY.
   _checkResponse(result) {
     if (result.ok) { return result.json() }
     else { return Promise.reject(`Ошибка: ${result.status}`) }
   }
 
-  // получение информации о пользователе (имя, профессия, аватар)
+  // ПОЛУЧЕНИЕ ИФНОРМАЦИИ О ПОЛЬЗОВАТЕЛЕ (ИМЯ, О СЕБЕ, АВАТАР)
   getUserData() {
     return fetch(`${this._baseUrl}/users/me`, {
       headers: this._headers
@@ -19,20 +22,20 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
-  // обновление информации о пользователе (имя, профессия)
-  patchUserInfo(newName, newJob) {
+  // ОБНОВЛЕНИЕ ИНФОРМАЦИИ О ПОЛЬЗОВАТЕЛЕ (ИМЯ, О СЕБЕ)
+  patchUserInfo(newName, newAbout) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify({
         name: newName,
-        about: newJob
+        about: newAbout
       })
     })
       .then(result => { return this._checkResponse(result); })
   }
 
-  // обновление аватара
+  // ОБНОВЛЕНИЕ АВАТАРА
   patchUserAvatar(newAvatar) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: 'PATCH',
@@ -44,7 +47,7 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
-  // запрос карточек с сервера
+  // ЗАПРОС КАРТОЧЕК С СЕРВЕРА
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
       headers: this._headers
@@ -52,7 +55,7 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
-  // добавление новой карточки
+  // ДОБАВЛЕНИЕ НОВОЙ КАРТОЧКИ
   postNewCard(cardTitle, cardImage) {
     return fetch(`${this._baseUrl}/cards`, {
       method: 'POST',
@@ -65,7 +68,7 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
-  // удаление карточки
+  // УДАЛЕНИЕ КАРТОЧКИ
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: 'DELETE',
@@ -74,10 +77,10 @@ class Api {
       .then(result => { return this._checkResponse(result); })
   }
 
-  // постановка/снятие лайка
-  changeLike(cardId, isNotLiked) {
+  // ПОСТАНОВКА/СНЯТИЕ ЛАЙКА
+  changeLike(cardId, isLiked) {
     return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-      method: isNotLiked ? 'PUT' : 'DELETE',
+      method: isLiked ? 'DELETE' : 'PUT',
       headers: this._headers
     })
       .then(result => { return this._checkResponse(result); })

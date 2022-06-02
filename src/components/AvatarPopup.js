@@ -1,13 +1,10 @@
 import React from 'react';
-import PopupWithForm from './PopupWithForm.js';
+import PopupWithForm from './PopupWithForm';
 
-// ПОПАП ОБНОВЛЕНИЯ АВАТАРА
-
-function EditAvatarPopup(props) {
+function AvatarPopup(props) {
 
   const avatarRef = React.useRef();
-
-  // обработка сабмита
+  
   function handleSubmit(event) {
     event.preventDefault();
     props.onUpdateAvatar({
@@ -28,13 +25,13 @@ function EditAvatarPopup(props) {
       <label className="popup__input-alignment">
         <input
           required ref={avatarRef} autoComplete="off"
-          id="avatar" name="avatar" className="popup__input"
+          id="avatar-input" name="avatar" className="popup__input"
           type="url" placeholder="Ссылка на аватар" />
-        <span id="avatar-error" className="popup__error"></span>
+        <span id="avatar-input-error" className="popup__error"></span>
       </label>
 
     </PopupWithForm>
   )
 }
 
-export default EditAvatarPopup;
+export default AvatarPopup;

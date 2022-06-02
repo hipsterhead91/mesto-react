@@ -1,6 +1,7 @@
 @import url(./__logo/header__logo.css);
 
 .header {
+  width: 100%;
   max-width: 882px;
   min-height: 74px;
   margin: 0 auto 40px auto;
@@ -11,7 +12,6 @@
 @media screen and (max-width: 320px) {
   .header {
     min-height: 56px;
-    width: 100%;
     margin: 0 auto 42px auto;
     padding: 28px 0 0 0;
   }

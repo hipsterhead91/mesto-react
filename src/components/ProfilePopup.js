@@ -2,35 +2,30 @@ import React from 'react';
 import PopupWithForm from './PopupWithForm.js';
 import CurrentUserContext from '../contexts/CurrentUserContext';
 
-// ПОПАП РЕДАКТИРОВАНИЯ ПРОФИЛЯ
-
-function EditProfilePopup(props) {
+function ProfilePopup(props) {
 
   const currentUser = React.useContext(CurrentUserContext);
   const [name, setName] = React.useState('');
-  const [description, setDescription] = React.useState('');
+  const [about, setAbout] = React.useState('');
 
   React.useEffect(() => {
     setName(currentUser.name);
-    setDescription(currentUser.about);
+    setAbout(currentUser.about);
   }, [currentUser]);
 
-  // инпут с именем
   function handleChangeName(event) {
     setName(event.target.value)
   }
 
-  // инпут с профессией
-  function handleChangeDescription(event) {
-    setDescription(event.target.value)
+  function handleChangeAbout(event) {
+    setAbout(event.target.value)
   }
 
-  // обработка сабмита
   function handleSubmit(event) {
     event.preventDefault();
     props.onUpdateUser({
       name,
-      about: description,
+      about: about,
     });
   }
 
@@ -45,22 +40,22 @@ function EditProfilePopup(props) {
 
       <label className="popup__input-alignment">
         <input
-          required defaultValue={name} onChange={handleChangeName}
-          id="name" name="name" className="popup__input" autoComplete="off"
+          className="popup__input" id="name-input" required defaultValue={name}
+          onChange={handleChangeName} name="name" autoComplete="off"
           type="text" placeholder="Имя" minLength="2" maxLength="40" />
-        <span id="name-error" className="popup__error"></span>
+        <span id="name-input-error" className="popup__error"></span>
       </label>
 
       <label className="popup__input-alignment">
         <input
-          required defaultValue={description} onChange={handleChangeDescription}
-          id="job" name="job" className="popup__input" autoComplete="off"
+          className="popup__input" id="about-input" required defaultValue={about}
+          onChange={handleChangeAbout} name="about" autoComplete="off"
           type="text" placeholder="О себе" minLength="2" maxLength="200" />
-        <span id="job-error" className="popup__error"></span>
+        <span id="about-input-error" className="popup__error"></span>
       </label>
 
     </PopupWithForm>
   )
 }
 
-export default EditProfilePopup;
+export default ProfilePopup;

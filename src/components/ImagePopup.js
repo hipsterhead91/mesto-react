@@ -1,16 +1,11 @@
 import React from 'react';
 
-
-// ПОПАП ПОЛНОРАЗМЕРНОЙ КАРТИНКИ
-
 function ImagePopup(props) {
 
-  // закрытие по клику на оверлей
   function closeByOverlayClick(event) {
     if (event.target.classList.contains('popup')) props.onClose();
   }
 
-  // закрытие по нажатию Esc
   function closeByEsc(event) {
     if (event.keyCode === 27) props.onClose();
   }
@@ -20,11 +15,13 @@ function ImagePopup(props) {
     return () => { document.removeEventListener("keydown", closeByEsc) };
   });
 
+  const visibilityModifier = props.isOpen ? "popup_opened" : "";
+
   return (
-    <div onClick={closeByOverlayClick} className={`popup ${props.isOpen && "popup_opened"}`} id="image-popup">
+    <div className={`popup ${visibilityModifier}`} id="image-popup" onClick={closeByOverlayClick}>
       <div className="popup__image-container">
-        <button onClick={props.onClose} className="popup__close-button" type="button"></button>
-        <img className="popup__image" src={props.selectedCard.link} alt="Пользовательское изображение." />
+        <button className="popup__close-button" type="button" onClick={props.onClose}></button>
+        <img className="popup__image" src={props.selectedCard.link} alt="Изображение, загруженное пользователем" />
         <p className="popup__image-title">{props.selectedCard.name}</p>
       </div>
     </div>

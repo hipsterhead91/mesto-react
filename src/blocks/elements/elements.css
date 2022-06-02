@@ -1,6 +1,7 @@
 .elements {
+  width: 100%;
   max-width: 882px;
-  min-height: 744px;
+  /* min-height: 744px; */
   margin: auto;
   padding: 0 0 66px 0;
   display: grid;

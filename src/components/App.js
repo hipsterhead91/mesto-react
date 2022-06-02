@@ -2,65 +2,68 @@ import React from 'react';
 import Header from './Header.js';
 import Main from './Main.js';
 import Footer from './Footer.js';
-import EditAvatarPopup from './EditAvatarPopup.js';
-import EditProfilePopup from './EditProfilePopup.js';
-import AddPlacePopup from './AddPlacePopup.js';
 import ImagePopup from './ImagePopup.js';
+import AvatarPopup from './AvatarPopup.js';
+import ProfilePopup from './ProfilePopup.js';
+import NewCardPopup from './NewCardPopup.js';
 import ConfirmationPopup from './ConfirmationPopup.js';
 import api from '../utils/Api.js';
 import { FormValidator, validationOptions } from '../utils/FormValidator.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
 
-// КОРНЕВОЙ КОМПОНЕНТ
-
 function App() {
 
+  // СТЕЙТЫ С ДАННЫМИ ПОЛЬЗОВАТЕЛЯ И ТЕКУЩИМИ КАРТОЧКАМИ
+  // Примечание: стейты обновляются при рендере страницы, а затем каждый раз, когда на сервер
+  // отправляются соответствующие изменения, но только в том случае, если изменения прошли и
+  // от сервера получен положительный ответ. Таким образом, данные в стейте и на сервере всегда
+  // одинаковые, и нам нет необходимости делать повторный запрос на сервер, чтобы удостовериться.
   const [currentUser, setCurrentUser] = React.useState({});
-  const [cards, setCards] = React.useState([]);
+  const [currentCards, setCurrentCards] = React.useState([]);
 
-  // получаем данные пользователя при запуске приложения
+  // ПОЛУЧАЕМ С СЕРВЕРА ДАННЫЕ О ПОЛЬЗОВАТЕЛЕ И ПЕРЕДАЁМ ИХ В СТЕЙТ
   React.useEffect(() => {
     api.getUserData()
       .then(user => setCurrentUser(user))
       .catch(error => console.error(error))
   }, []);
 
-  // получаем карточки с сервера при запуске приложения
+  // ПОЛУЧАЕМ С СЕРВЕРА СПИСОК КАРТОЧЕК И ПЕРЕДАЁМ ИХ В СТЕЙТ
   React.useEffect(() => {
     api.getInitialCards()
-      .then(initialCards => setCards(initialCards))
+      .then(initialCards => setCurrentCards(initialCards))
       .catch(error => console.error(error))
-  });
+  }, []);
 
-  // статусы попапов (открыт/закрыт)
-  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
-  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
-  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
+  // СТЕЙТЫ С СОСТОЯНИЕМ ПОПАПОВ (ОТКРЫТЫ/ЗАКРЫТЫ)
+  const [isAvatarPopupOpen, setIsAvatarPopupOpen] = React.useState(false);
+  const [isProfilePopupOpen, setIsProfilePopupOpen] = React.useState(false);
+  const [isNewCardPopupOpen, setIsNewCardPopupOpen] = React.useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = React.useState(false);
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = React.useState(false);
 
-  // определяем текущую карточку (используется для её удаления или для открытия в полном размере)
+  // СТЕЙТ С ТЕКУЩЕЙ ВЫБРАННОЙ КАРТОЧКОЙ
   const [selectedCard, setSelectedCard] = React.useState({});
 
-  // закрытие попапов
+  // ЗАКРЫТИЕ ВСЕХ ПОПАПОВ
   const closeAllPopups = () => {
-    setIsEditAvatarPopupOpen(false);
-    setIsEditProfilePopupOpen(false);
-    setIsAddPlacePopupOpen(false);
+    setIsAvatarPopupOpen(false);
+    setIsProfilePopupOpen(false);
+    setIsNewCardPopupOpen(false);
     setIsImagePopupOpen(false);
     setIsConfirmationPopupOpen(false);
     setSelectedCard({});
   };
 
-  // открытие попапа с полноразмерной картинкой
-  function handleOpenImage(card) {
+  // ОТКРЫТИЕ КАРТИНКИ В ПОЛНОМ РАЗМЕРЕ
+  function handleImageClick(card) {
     setSelectedCard(card);
     setIsImagePopupOpen(true);
   }
 
-  // обновление аватара
+  // ОБНОВЛЕНИЕ АВАТАРА
   function handleUpdateAvatar({ avatar }) {
-    const avatarInput = document.querySelector('#avatar');
+    const avatarInput = document.querySelector('#avatar-input');
     api.patchUserAvatar(avatar)
       .then((user) => {
         document.querySelector('.profile__avatar').src = user.avatar;
@@ -70,8 +73,8 @@ function App() {
       .catch(error => console.error(error))
   }
 
-  // обновление профиля
-  function handleUpdateUser({ name, about }) {
+  // ОБНОВЛЕНИЕ ПРОФИЛЯ
+  function handleUpdateProfile({ name, about }) {
     api.patchUserInfo(name, about)
       .then((user) => {
         setCurrentUser(user);
@@ -80,13 +83,13 @@ function App() {
       .catch(error => console.error(error))
   }
 
-  // добавление новой карточки
-  function handleAddPlaceSubmit({ title, link }) {
-    const titleInput = document.querySelector('#title');
-    const linkInput = document.querySelector('#link');
+  // ДОБАВЛЕНИЕ НОВОЙ КАРТОЧКИ
+  function handleNewCardSubmit({ title, link }) {
+    const titleInput = document.querySelector('#title-input');
+    const linkInput = document.querySelector('#link-input');
     api.postNewCard(title, link)
       .then((newCard) => {
-        setCards([...cards, newCard]);
+        setCurrentCards([...currentCards, newCard]);
         closeAllPopups();
         titleInput.value = '';
         linkInput.value = '';
@@ -94,41 +97,46 @@ function App() {
       .catch(error => console.error(error))
   }
 
-  // лайк карточки
+  // ЛАЙК КАРТОЧКИ
+  // Примечание: then после api.changeLike возвращает newCard вместо card - ту же самую карточку, 
+  // но с изменённым свойством likes. Далее массив текущих карточек преобразуется: среди всех карточек
+  // находится исходная card по id, совпадающему с newCard, и старая карточка заменяется на новую.
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-    api.changeLike(card._id, !isLiked)
+    const isLiked = card.likes.some(с => с._id === currentUser._id);
+    api.changeLike(card._id, isLiked)
       .then((newCard) => {
-        const newCards = cards.map(c => c._id === card._id ? newCard : c);
-        setCards(newCards);
+        const newCards = currentCards.map(c => c._id === card._id ? newCard : c);
+        setCurrentCards(newCards);
       })
       .catch(error => console.error(error))
   }
 
-  // клик по корзине
+  // КЛИК ПО КОРЗИНЕ
   function handleDeleteClick(card) {
     setSelectedCard(card);
     setIsConfirmationPopupOpen(true);
   }
 
-  // удаление карточки
-  function handleRemoveCard() {
+  // УДАЛЕНИЕ КАРТОЧКИ
+  // Примечание: в отличие от лайка, здесь then не возвращает новую карточку (нечего возвращать),
+  // но массив текущих карточек всё равно изменяется путём отсева текущей выбранной карточки.
+  function handleDeleteCard() {
     api.deleteCard(selectedCard._id)
       .then(() => {
-        const newCards = cards.filter(c => c._id !== selectedCard._id);
-        setCards(newCards);
+        const newCards = currentCards.filter(c => c._id !== selectedCard._id);
+        setCurrentCards(newCards);
         closeAllPopups();
       })
       .catch(error => console.error(error))
   }
 
-  // включаем валидацию форм
+  // ВКЛЮЧАЕМ ВАЛИДАЦИЮ ФОРМ
   React.useEffect(() => {
     const avatarFormValidator = new FormValidator({
       validationOptions: validationOptions,
       formSelector: '#avatar-form'
     });
-    
+
     const profileFormValidator = new FormValidator({
       validationOptions: validationOptions,
       formSelector: '#profile-form'
@@ -150,56 +158,56 @@ function App() {
         <Header />
 
         <Main
-          cards={cards}
-          onEditAvatar={() => setIsEditAvatarPopupOpen(true)}
-          onEditProfile={() => setIsEditProfilePopupOpen(true)}
-          onAddPlace={() => setIsAddPlacePopupOpen(true)}
-          onGetCard={handleOpenImage}
-          onCardDelete={handleDeleteClick}
+          cards={currentCards}
+          onEditAvatar={() => setIsAvatarPopupOpen(true)}
+          onEditProfile={() => setIsProfilePopupOpen(true)}
+          onAddCard={() => setIsNewCardPopupOpen(true)}
+          onGetCard={handleImageClick}
           onCardLike={handleCardLike}
+          onCardDelete={handleDeleteClick}
         />
 
         <Footer />
 
-        <EditAvatarPopup // попап обновления аватара
+        <AvatarPopup
           name='avatar'
           title='Обновить аватар'
           button='Сохранить'
           sizeModifier='popup__container_medium'
-          isOpen={isEditAvatarPopupOpen}
+          isOpen={isAvatarPopupOpen}
           onClose={closeAllPopups}
           onUpdateAvatar={handleUpdateAvatar}
         />
 
-        <EditProfilePopup // попап обновления профиля
+        <ProfilePopup
           name='profile'
           title='Редактировать профиль'
           button='Сохранить'
-          isOpen={isEditProfilePopupOpen}
+          isOpen={isProfilePopupOpen}
           onClose={closeAllPopups}
-          onUpdateUser={handleUpdateUser}
+          onUpdateUser={handleUpdateProfile}
         />
 
-        <AddPlacePopup // попап добавления новой карточки
+        <NewCardPopup
           name='new-card'
-          title='Новое место'
+          title='Новая карточка'
           button='Сохранить'
-          isOpen={isAddPlacePopupOpen}
+          isOpen={isNewCardPopupOpen}
           onClose={closeAllPopups}
-          onAddPlace={handleAddPlaceSubmit}
+          onAddPlace={handleNewCardSubmit}
         />
 
-        <ConfirmationPopup // попап подтверждения удаления карточки (сейчас вообще не работает)
+        <ConfirmationPopup
           name='confirmation'
           title='Вы уверены?'
           button='Да'
           sizeModifier='popup__container_small'
           isOpen={isConfirmationPopupOpen}
           onClose={closeAllPopups}
-          onRemoveCard={handleRemoveCard}
+          onRemoveCard={handleDeleteCard}
         />
 
-        <ImagePopup // попап полноразмерной картинки
+        <ImagePopup
           isOpen={isImagePopupOpen}
           selectedCard={selectedCard}
           onClose={closeAllPopups}
