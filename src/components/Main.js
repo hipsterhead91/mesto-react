@@ -1,10 +1,12 @@
 import React from 'react';
 import Card from './Card.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
+import CurrentCardsContext from '../contexts/CurrentCardsContext.js';
 
 function Main(props) {
 
   const currentUser = React.useContext(CurrentUserContext);
+  const currentCards = React.useContext(CurrentCardsContext);
 
   return (
     <main>
@@ -26,7 +28,7 @@ function Main(props) {
       </section>
 
       <section className="elements">
-        {props.cards.map(card =>
+        {currentCards.map(card =>
           <Card
             key={card._id}
             card={card}

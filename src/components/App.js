@@ -10,6 +10,8 @@ import ConfirmationPopup from './ConfirmationPopup.js';
 import api from '../utils/Api.js';
 import { FormValidator, validationOptions } from '../utils/FormValidator.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
+import CurrentCardsContext from '../contexts/CurrentCardsContext.js';
+import placeholderPath from '../images/placeholder-image.jpg';
 
 function App() {
 
@@ -34,6 +36,20 @@ function App() {
       .then(initialCards => setCurrentCards(initialCards))
       .catch(error => console.error(error))
   }, []);
+
+  // ЗАМЕНЯЕМ ИЗОБРАЖЕНИЯ КАРТОЧЕК НА ПЛЕЙСХОЛДЕР, ЕСЛИ ОНИ НЕ ЗАГРУЗИЛИСЬ
+  React.useEffect(() => {
+    const imgs = document.querySelectorAll('.element__image');
+    imgs.forEach(img => {
+      img.onerror = () => img.src = placeholderPath;
+    });
+  });
+
+  // ЗАМЕНЯЕМ ИЗОБРАЖЕНИЕ В ПОПАПЕ НА ПЛЕЙСХОЛДЕР, ЕСЛИ ОНО НЕ ЗАГРУЗИЛОСЬ
+  React.useEffect(() => {
+    const img = document.querySelector('.popup__image');
+    img.onerror = () => img.src = placeholderPath;
+  });
 
   // СТЕЙТЫ С СОСТОЯНИЕМ ПОПАПОВ (ОТКРЫТЫ/ЗАКРЫТЫ)
   const [isAvatarPopupOpen, setIsAvatarPopupOpen] = React.useState(false);
@@ -89,7 +105,9 @@ function App() {
     const linkInput = document.querySelector('#link-input');
     api.postNewCard(title, link)
       .then((newCard) => {
-        setCurrentCards([...currentCards, newCard]);
+        let arr = currentCards;
+        arr.pop();
+        setCurrentCards([newCard, ...arr]);
         closeAllPopups();
         titleInput.value = '';
         linkInput.value = '';
@@ -154,66 +172,67 @@ function App() {
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <div className="page">
-        <Header />
+      <CurrentCardsContext.Provider value={currentCards}>
+        <div className="page">
+          <Header />
 
-        <Main
-          cards={currentCards}
-          onEditAvatar={() => setIsAvatarPopupOpen(true)}
-          onEditProfile={() => setIsProfilePopupOpen(true)}
-          onAddCard={() => setIsNewCardPopupOpen(true)}
-          onGetCard={handleImageClick}
-          onCardLike={handleCardLike}
-          onCardDelete={handleDeleteClick}
-        />
+          <Main
+            onEditAvatar={() => setIsAvatarPopupOpen(true)}
+            onEditProfile={() => setIsProfilePopupOpen(true)}
+            onAddCard={() => setIsNewCardPopupOpen(true)}
+            onGetCard={handleImageClick}
+            onCardLike={handleCardLike}
+            onCardDelete={handleDeleteClick}
+          />
 
-        <Footer />
+          <Footer />
 
-        <AvatarPopup
-          name='avatar'
-          title='Обновить аватар'
-          button='Сохранить'
-          sizeModifier='popup__container_medium'
-          isOpen={isAvatarPopupOpen}
-          onClose={closeAllPopups}
-          onUpdateAvatar={handleUpdateAvatar}
-        />
+          <AvatarPopup
+            name='avatar'
+            title='Обновить аватар'
+            button='Сохранить'
+            sizeModifier='popup__container_medium'
+            isOpen={isAvatarPopupOpen}
+            onClose={closeAllPopups}
+            onUpdateAvatar={handleUpdateAvatar}
+          />
 
-        <ProfilePopup
-          name='profile'
-          title='Редактировать профиль'
-          button='Сохранить'
-          isOpen={isProfilePopupOpen}
-          onClose={closeAllPopups}
-          onUpdateUser={handleUpdateProfile}
-        />
+          <ProfilePopup
+            name='profile'
+            title='Редактировать профиль'
+            button='Сохранить'
+            isOpen={isProfilePopupOpen}
+            onClose={closeAllPopups}
+            onUpdateUser={handleUpdateProfile}
+          />
 
-        <NewCardPopup
-          name='new-card'
-          title='Новая карточка'
-          button='Сохранить'
-          isOpen={isNewCardPopupOpen}
-          onClose={closeAllPopups}
-          onAddPlace={handleNewCardSubmit}
-        />
+          <NewCardPopup
+            name='new-card'
+            title='Новая карточка'
+            button='Сохранить'
+            isOpen={isNewCardPopupOpen}
+            onClose={closeAllPopups}
+            onAddPlace={handleNewCardSubmit}
+          />
 
-        <ConfirmationPopup
-          name='confirmation'
-          title='Вы уверены?'
-          button='Да'
-          sizeModifier='popup__container_small'
-          isOpen={isConfirmationPopupOpen}
-          onClose={closeAllPopups}
-          onRemoveCard={handleDeleteCard}
-        />
+          <ConfirmationPopup
+            name='confirmation'
+            title='Вы уверены?'
+            button='Да'
+            sizeModifier='popup__container_small'
+            isOpen={isConfirmationPopupOpen}
+            onClose={closeAllPopups}
+            onRemoveCard={handleDeleteCard}
+          />
 
-        <ImagePopup
-          isOpen={isImagePopupOpen}
-          selectedCard={selectedCard}
-          onClose={closeAllPopups}
-        />
+          <ImagePopup
+            isOpen={isImagePopupOpen}
+            selectedCard={selectedCard}
+            onClose={closeAllPopups}
+          />
 
-      </div>
+        </div>
+      </CurrentCardsContext.Provider>
     </CurrentUserContext.Provider>
   );
 }

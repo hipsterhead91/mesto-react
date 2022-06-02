@@ -18,7 +18,7 @@ function Card(props) {
   return (
     <div className="element">
       <button className={deleteButtonClassName} type="button" onClick={handleDeleteClick} ></button>
-      <img className="element__image" src={props.card.link} alt="Пользовательское изображение." onClick={handleClick} />
+      <img  className="element__image" src={props.card.link} alt="Пользовательское изображение." onClick={handleClick} />
       <div className="element__horizontal-alignment">
         <h2 className="element__title">{props.card.name}</h2>
         <div className="element__vertical-alignment">
